@@ -1,17 +1,15 @@
 "use client";
 
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import type { Product, SelectedVariant, VariantOption } from "#data/types";
 import { getAttributeDisplay } from "#data/variant-config";
 import { clsx } from "clsx";
 
 type SelectionState = Record<string, string | number | undefined>;
 
-type SelectionAction = {
-    type: "SET";
-    key: string;
-    value: string | number;
-};
+type SelectionAction =
+    | { type: "SET"; key: string; value: string | number }
+    | { type: "RESET"; state: SelectionState };
 
 type VariantSelectorProps = {
     product: Product;
@@ -28,13 +26,45 @@ function extractAttributeKeys(options: VariantOption[]) {
     return Object.keys(options[0].attributes);
 }
 
-function extractAttributeValues(options: VariantOption[], key: string) {
+function extractAllValues(options: VariantOption[], key: string) {
     const values = new Set<string | number>();
     for (const option of options) {
         for (const value of option.attributes[key] ?? []) {
             values.add(value);
         }
     }
+    return [...values];
+}
+
+function getAvailableValuesForKey(
+    options: VariantOption[],
+    targetKey: string,
+    state: SelectionState,
+    attributeKeys: string[],
+) {
+    const targetIndex = attributeKeys.indexOf(targetKey);
+    const values = new Set<string | number>();
+
+    for (const option of options) {
+        let matches = true;
+        for (let i = 0; i < targetIndex; i++) {
+            const key = attributeKeys[i];
+            const selectedValue = state[key];
+            if (
+                selectedValue !== undefined &&
+                !option.attributes[key]?.includes(selectedValue)
+            ) {
+                matches = false;
+                break;
+            }
+        }
+        if (matches) {
+            for (const value of option.attributes[targetKey] ?? []) {
+                values.add(value);
+            }
+        }
+    }
+
     return [...values];
 }
 
@@ -60,7 +90,7 @@ function buildInitialState(options: VariantOption[]) {
     const state: SelectionState = {};
 
     for (const key of keys) {
-        const values = extractAttributeValues(options, key);
+        const values = extractAllValues(options, key);
         state[key] = values.length === 1 ? values[0] : undefined;
     }
 
@@ -97,16 +127,14 @@ function getInitialVariantState(product: Product) {
 }
 
 function selectionReducer(state: SelectionState, action: SelectionAction) {
+    if (action.type === "RESET") {
+        return action.state;
+    }
     return { ...state, [action.key]: action.value };
 }
 
 function VariantSelector({ product, onVariantChange }: VariantSelectorProps) {
     const attributeKeys = extractAttributeKeys(product.options);
-
-    const attributeValues: Record<string, (string | number)[]> = {};
-    for (const key of attributeKeys) {
-        attributeValues[key] = extractAttributeValues(product.options, key);
-    }
 
     const [state, dispatch] = useReducer(
         selectionReducer,
@@ -114,9 +142,41 @@ function VariantSelector({ product, onVariantChange }: VariantSelectorProps) {
         buildInitialState,
     );
 
+    useEffect(() => {
+        const { variant, isValid } = computeValidation(state, product.options);
+        onVariantChange(variant, isValid);
+    }, []);
+
     function handleSelect(key: string, value: string | number) {
-        const newState = { ...state, [key]: value };
-        dispatch({ type: "SET", key, value });
+        const keyIndex = attributeKeys.indexOf(key);
+        const newState: SelectionState = {};
+
+        for (let i = 0; i < attributeKeys.length; i++) {
+            const k = attributeKeys[i];
+            if (i < keyIndex) {
+                newState[k] = state[k];
+            } else if (i === keyIndex) {
+                newState[k] = value;
+            } else {
+                const available = getAvailableValuesForKey(
+                    product.options,
+                    k,
+                    newState,
+                    attributeKeys,
+                );
+                if (available.length === 1) {
+                    newState[k] = available[0];
+                } else if (
+                    state[k] !== undefined && available.includes(state[k]!)
+                ) {
+                    newState[k] = state[k];
+                } else {
+                    newState[k] = undefined;
+                }
+            }
+        }
+
+        dispatch({ type: "RESET", state: newState });
 
         const { variant, isValid } = computeValidation(
             newState,
@@ -133,11 +193,17 @@ function VariantSelector({ product, onVariantChange }: VariantSelectorProps) {
         <div className="space-y-4 p-4 bg-base-200 rounded-lg">
             {attributeKeys.map((key) => {
                 const config = getAttributeDisplay(key);
+                const availableOptions = getAvailableValuesForKey(
+                    product.options,
+                    key,
+                    state,
+                    attributeKeys,
+                );
                 return (
                     <OptionGroup
                         key={key}
                         label={key}
-                        options={attributeValues[key]}
+                        options={availableOptions}
                         selected={state[key]}
                         onSelect={(value) => handleSelect(key, value)}
                         suffix={config.suffix}

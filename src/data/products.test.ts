@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getProductById, getProducts } from "./products";
+import {
+    getAllBrands,
+    getProductById,
+    getProducts,
+    getProductsByBrand,
+} from "./products";
 
 describe("Product Service", () => {
     describe("getProducts", () => {
@@ -49,6 +54,45 @@ describe("Product Service", () => {
             const product = getProductById(99999);
 
             expect(product).toBeUndefined();
+        });
+    });
+
+    describe("getProductsByBrand", () => {
+        it("returns products matching brand", () => {
+            const products = getProductsByBrand("Sony");
+
+            expect(products.length).toBeGreaterThan(0);
+            products.forEach((p) => expect(p.brand).toBe("Sony"));
+        });
+
+        it("is case-insensitive", () => {
+            const lower = getProductsByBrand("sony");
+            const upper = getProductsByBrand("SONY");
+
+            expect(lower.length).toBe(upper.length);
+            expect(lower.length).toBeGreaterThan(0);
+        });
+
+        it("returns empty array for non-existent brand", () => {
+            const products = getProductsByBrand("NonExistentBrand");
+
+            expect(products).toEqual([]);
+        });
+    });
+
+    describe("getAllBrands", () => {
+        it("returns unique brand names", () => {
+            const brands = getAllBrands();
+
+            expect(brands.length).toBeGreaterThan(0);
+            expect(new Set(brands).size).toBe(brands.length);
+        });
+
+        it("includes known brands", () => {
+            const brands = getAllBrands();
+
+            expect(brands).toContain("Sony");
+            expect(brands).toContain("Nintendo");
         });
     });
 });

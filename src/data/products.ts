@@ -111,5 +111,50 @@ function getProductById(id: number) {
     return products.find((p) => p.id === id);
 }
 
-export { getProductById, getProducts };
+/**
+ * Returns products filtered by brand name (case-insensitive).
+ */
+function getProductsByBrand(brand: string) {
+    return products.filter(
+        (p) => p.brand.toLowerCase() === brand.toLowerCase(),
+    );
+}
+
+/**
+ * Returns products filtered by brand slug.
+ */
+function getProductsByBrandSlug(slug: string) {
+    return products.filter(
+        (p) => slugify(p.brand) === slug.toLowerCase(),
+    );
+}
+
+/**
+ * Returns all unique brand names.
+ */
+function getAllBrands() {
+    return [...new Set(products.map((p) => p.brand))];
+}
+
+function slugify(text: string) {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
+function getBrandSlug(brand: string) {
+    return slugify(brand);
+}
+
+export {
+    getAllBrands,
+    getBrandSlug,
+    getProductById,
+    getProducts,
+    getProductsByBrand,
+    getProductsByBrandSlug,
+};
 export type { GetProductsOptions };

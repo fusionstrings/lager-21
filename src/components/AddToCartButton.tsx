@@ -97,7 +97,8 @@ function AddToCartButton({ product }: AddToCartProps) {
 
     const canAdd = product.available && (!hasOptions || isValid);
     const atMaxStock = remainingStock !== undefined && remainingStock === 0;
-    const lowStock = remainingStock !== undefined &&
+    const lowStock = product.available &&
+        remainingStock !== undefined &&
         remainingStock > 0 &&
         remainingStock <= LOW_STOCK_THRESHOLD;
 
@@ -123,10 +124,12 @@ function AddToCartButton({ product }: AddToCartProps) {
 
     return (
         <div className="space-y-6">
-            <VariantSelector
-                product={product}
-                onVariantChange={handleVariantChange}
-            />
+            {product.available && (
+                <VariantSelector
+                    product={product}
+                    onVariantChange={handleVariantChange}
+                />
+            )}
 
             <div className="flex flex-col gap-4">
                 {canAdd && remainingStock !== undefined && remainingStock > 0 &&

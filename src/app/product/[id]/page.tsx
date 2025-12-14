@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getProductById, getProducts } from "#data/products";
+import { getBrandSlug, getProductById, getProducts } from "#data/products";
 import { AddToCartButton } from "#components/AddToCartButton";
 import { SITE_NAME } from "#config";
 
@@ -45,7 +45,11 @@ async function ProductPage({ params }: Props) {
                     <li>
                         <Link href="/">Home</Link>
                     </li>
-                    <li>{product.brand}</li>
+                    <li>
+                        <Link href={`/brand/${getBrandSlug(product.brand)}`}>
+                            {product.brand}
+                        </Link>
+                    </li>
                     <li className="font-bold">{product.name}</li>
                 </ul>
             </div>

@@ -128,3 +128,29 @@ test.describe("API", () => {
             .toBe(true);
     });
 });
+
+test.describe("Brand Pages", () => {
+    test("brand page shows filtered products", async ({ page }) => {
+        await page.goto("/brand/sony");
+
+        await expect(page.locator("h1")).toContainText("Sony");
+        const productCards = page.locator("article");
+        await expect(productCards.first()).toBeVisible();
+    });
+
+    test("breadcrumb navigates to brand page", async ({ page }) => {
+        await page.goto("/product/3");
+
+        const brandLink = page.locator(".breadcrumbs a", { hasText: "Sony" });
+        await brandLink.click();
+
+        await expect(page).toHaveURL(/\/brand\/sony/);
+        await expect(page.locator("h1")).toContainText("Sony");
+    });
+
+    test("non-existent brand shows 404", async ({ page }) => {
+        await page.goto("/brand/nonexistentbrand");
+
+        await expect(page.locator("h1")).toContainText("404");
+    });
+});
