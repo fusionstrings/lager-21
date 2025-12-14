@@ -97,17 +97,25 @@ describe("VariantSelector", () => {
             .toBeInTheDocument();
     });
 
-    it("auto-selects when only one option exists", () => {
+    it("auto-selects first option in each attribute group", () => {
         const onVariantChange = vi.fn();
         render(
             <VariantSelector
-                product={productWithSingleOption}
+                product={productWithOptions}
                 onVariantChange={onVariantChange}
             />,
         );
 
-        const blackButton = screen.getByRole("button", { name: /black/i });
-        expect(blackButton).toHaveClass("btn-primary");
+        const whiteButton = screen.getByRole("button", { name: /white/i });
+        const power65Button = screen.getByRole("button", { name: /6\.5W/i });
+        expect(whiteButton).toHaveClass("btn-primary");
+        expect(power65Button).toHaveClass("btn-primary");
+    });
+
+    it("getInitialVariantState returns valid variant with first options selected", () => {
+        const result = getInitialVariantState(productWithOptions);
+        expect(result.variant).toEqual({ Color: "white", Power: 6.5 });
+        expect(result.isValid).toBe(true);
     });
 
     it("calls onVariantChange when selection made", () => {
@@ -119,7 +127,7 @@ describe("VariantSelector", () => {
             />,
         );
 
-        fireEvent.click(screen.getByRole("button", { name: /white/i }));
+        fireEvent.click(screen.getByRole("button", { name: /red/i }));
 
         expect(onVariantChange).toHaveBeenCalled();
     });
