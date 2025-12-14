@@ -91,7 +91,7 @@ function buildInitialState(options: VariantOption[]) {
 
     for (const key of keys) {
         const values = extractAllValues(options, key);
-        state[key] = values.length === 1 ? values[0] : undefined;
+        state[key] = values[0];
     }
 
     return state;

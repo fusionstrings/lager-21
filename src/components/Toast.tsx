@@ -9,10 +9,11 @@ type Toast = {
     id: number;
     type: ToastType;
     message: string;
+    title?: string;
 };
 
 type ToastContextType = {
-    showToast: (type: ToastType, message: string) => void;
+    showToast: (type: ToastType, message: string, title?: string) => void;
 };
 
 const ToastContext = createContext<ToastContextType | null>(null);
@@ -42,14 +43,17 @@ const TOAST_STYLES = {
 function ToastProvider({ children }: { children: React.ReactNode }) {
     const [toasts, setToasts] = useState<Toast[]>([]);
 
-    const showToast = useCallback((type: ToastType, message: string) => {
-        const id = Date.now();
-        setToasts((prev) => [...prev, { id, type, message }]);
+    const showToast = useCallback(
+        (type: ToastType, message: string, title?: string) => {
+            const id = Date.now();
+            setToasts((prev) => [...prev, { id, type, message, title }]);
 
-        setTimeout(() => {
-            setToasts((prev) => prev.filter((t) => t.id !== id));
-        }, 3000);
-    }, []);
+            setTimeout(() => {
+                setToasts((prev) => prev.filter((t) => t.id !== id));
+            }, 3000);
+        },
+        [],
+    );
 
     const removeToast = useCallback((id: number) => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -69,7 +73,14 @@ function ToastProvider({ children }: { children: React.ReactNode }) {
                             } shadow-lg animate-slide-in-right`}
                         >
                             <Icon className="w-5 h-5" />
-                            <span>{toast.message}</span>
+                            <div className="flex flex-col">
+                                {toast.title && (
+                                    <span className="font-semibold text-sm">
+                                        {toast.title}
+                                    </span>
+                                )}
+                                <span>{toast.message}</span>
+                            </div>
                             <button
                                 type="button"
                                 className="btn btn-ghost btn-xs btn-circle"

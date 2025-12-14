@@ -73,19 +73,27 @@ function CheckoutPage() {
                                 key={item.cartId}
                                 className="card bg-base-100 shadow-sm flex flex-col sm:flex-row overflow-hidden"
                             >
-                                <figure className="w-full sm:w-32 h-32 flex-shrink-0">
-                                    <img
-                                        src={imageUrl}
-                                        alt={item.name}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </figure>
+                                <Link
+                                    href={`/product/${item.id}`}
+                                    className="w-full sm:w-32 h-32 flex-shrink-0"
+                                >
+                                    <figure className="w-full h-full">
+                                        <img
+                                            src={imageUrl}
+                                            alt={item.name}
+                                            className="w-full h-full object-cover hover:opacity-80 transition-opacity"
+                                        />
+                                    </figure>
+                                </Link>
 
                                 <div className="card-body p-4 flex flex-col sm:flex-row w-full gap-4 sm:items-center sm:justify-between">
                                     <div className="space-y-1">
-                                        <h3 className="font-bold text-lg">
+                                        <Link
+                                            href={`/product/${item.id}`}
+                                            className="font-bold text-lg hover:text-primary transition-colors"
+                                        >
                                             {item.name}
-                                        </h3>
+                                        </Link>
                                         {variantText && (
                                             <p className="text-sm opacity-70">
                                                 {variantText}
@@ -122,6 +130,9 @@ function CheckoutPage() {
                                                         1,
                                                         maxStock,
                                                     )}
+                                                disabled={maxStock !==
+                                                        undefined &&
+                                                    item.quantity >= maxStock}
                                                 aria-label="Increase quantity"
                                             >
                                                 <Plus className="w-4 h-4" />
