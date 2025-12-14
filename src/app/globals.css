@@ -1,0 +1,124 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "lager21";
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: #fafafa;
+  --color-base-200: #f0f0f0;
+  --color-base-300: #e0e0e0;
+  --color-base-content: #0a0a0a;
+
+  --color-primary: #0a0a0a;
+  --color-primary-content: #fafafa;
+
+  --color-secondary: #e63312;
+  --color-secondary-content: #ffffff;
+
+  --color-accent: #0052cc;
+  --color-accent-content: #ffffff;
+
+  --color-neutral: #1a1a1a;
+  --color-neutral-content: #f5f5f5;
+
+  --color-info: #0066cc;
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+
+  --radius-box: 0;
+  --radius-btn: 0;
+  --radius-badge: 0;
+}
+
+/* Typography system */
+html {
+  font-feature-settings: "ss01", "ss02", "cv01";
+  -webkit-font-smoothing: antialiased;
+}
+
+.display {
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.headline {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Card system */
+.card-brutal {
+  border: 2px solid currentColor;
+  background: var(--color-base-100);
+}
+
+.card-brutal:hover {
+  box-shadow: 6px 6px 0 var(--color-base-content);
+  transform: translate(-3px, -3px);
+}
+
+.card-brutal {
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+}
+
+/* Price typography */
+.price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* Button refinements */
+.btn {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Focus */
+:focus-visible {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--color-secondary);
+  color: white;
+}
+
+/* Micro-interactions */
+.link-hover {
+  position: relative;
+}
+
+.link-hover::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.2s ease;
+}
+
+.link-hover:hover::after {
+  width: 100%;
+}

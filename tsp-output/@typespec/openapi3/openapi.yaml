@@ -1,0 +1,117 @@
+openapi: 3.0.0
+info:
+  title: Lager 21 API
+  version: 0.0.0
+tags:
+  - name: Products
+paths:
+  /api/products:
+    get:
+      operationId: Products_list
+      parameters:
+        - name: available
+          in: query
+          required: false
+          schema:
+            type: boolean
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+      tags:
+        - Products
+  /api/products/{id}:
+    get:
+      operationId: Products_get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: The server cannot find the requested resource.
+      tags:
+        - Products
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - brand
+        - price
+        - available
+        - weight
+        - options
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        brand:
+          type: string
+        price:
+          type: number
+          format: double
+        available:
+          type: boolean
+        weight:
+          type: number
+          format: double
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/VariantOption'
+    ProductListResponse:
+      type: object
+      required:
+        - products
+        - total
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        total:
+          type: integer
+          format: int32
+    VariantOption:
+      type: object
+      required:
+        - attributes
+        - quantity
+      properties:
+        attributes:
+          type: object
+          additionalProperties:
+            type: array
+            items: {}
+        quantity:
+          type: integer
+          format: int32
+servers:
+  - url: http://localhost:3000
+    description: Development server
+    variables: {}
