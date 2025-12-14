@@ -1,6 +1,6 @@
 # Lager 21
 
-Swedish electronics store built with Next.js 16, React 19, and TypeScript.
+Example e-commerce store built with Next.js 16, React 19, and TypeScript.
 
 ## Quick Start
 
