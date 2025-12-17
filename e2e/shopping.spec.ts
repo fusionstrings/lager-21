@@ -1,6 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
-async function selectAllVariants(page: import("@playwright/test").Page) {
+async function selectAllVariants(page: Page) {
     const optionGroups = page.locator(".form-control");
     const groupCount = await optionGroups.count();
 

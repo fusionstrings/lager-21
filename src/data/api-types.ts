@@ -11,11 +11,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description List all products
-         *
-         *     Returns all products in inventory. Optionally filter by availability.
-         */
         get: operations["Products_list"];
         put?: never;
         post?: never;
@@ -32,11 +27,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description Get a single product by ID
-         *
-         *     Returns detailed product information including all variant options.
-         */
         get: operations["Products_get"];
         put?: never;
         post?: never;
@@ -50,63 +40,45 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description Standard error response */
         ErrorResponse: {
-            /** @description Error message */
             error: string;
         };
-        /** @description A product available for purchase */
+        /** @description Root inventory structure from third-party JSON. */
+        InventoryData: {
+            items: components["schemas"]["Product"][];
+        };
+        /** @description A product in the inventory. */
         Product: {
-            /**
-             * Format: int32
-             * @description Unique product identifier
-             */
+            /** Format: int32 */
             id: number;
-            /** @description Product display name */
             name: string;
-            /** @description Manufacturer or brand name */
             brand: string;
-            /**
-             * Format: double
-             * @description Price in SEK
-             */
-            price: number;
-            /** @description Whether the product is currently available for purchase */
+            /** @description Price in SEK (stored as string in JSON) */
+            price: string;
             available: boolean;
-            /**
-             * Format: double
-             * @description Product weight in kilograms
-             */
+            /** Format: double */
             weight: number;
-            /** @description Available variant options (colors, sizes, etc.) */
             options: components["schemas"]["VariantOption"][];
         };
-        /** @description Response containing a list of products */
         ProductListResponse: {
-            /** @description Array of products */
             products: components["schemas"]["Product"][];
-            /**
-             * Format: int32
-             * @description Total count of products in response
-             */
+            /** Format: int32 */
             total: number;
         };
         /**
-         * @description Product variant options (color, power, storage combinations)
-         *
-         *     Each option represents a purchasable configuration with its
-         *     own stock quantity.
+         * @description Product variant with optional attributes.
+         *     Color can be a single string or array of strings.
          */
         VariantOption: {
-            /** @description Available colors for this variant */
-            color: string[];
+            /** @description Color options - can be string or string array in raw JSON */
+            color?: string | string[];
             /** @description Power options in watts (for lighting products) */
             power?: number[];
             /** @description Storage options in GB (for electronics) */
             storage?: string[];
             /**
              * Format: int32
-             * @description Stock quantity for this specific combination
+             * @description Stock quantity for this variant
              */
             quantity: number;
         };
@@ -122,7 +94,6 @@ export interface operations {
     Products_list: {
         parameters: {
             query?: {
-                /** @description Filter by availability status */
                 available?: boolean;
             };
             header?: never;
@@ -147,7 +118,6 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Product ID */
                 id: number;
             };
             cookie?: never;

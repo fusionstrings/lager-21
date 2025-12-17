@@ -1,16 +1,11 @@
 import type { Product, VariantOption } from "#data/types";
+import type { components } from "#data/api-types";
 import { toTitleCase } from "#data/variant-config";
 import inventoryData from "#data/inventory.json";
 
-type RawProduct = {
-    id: number | string;
-    name?: string;
-    brand?: string;
-    price?: string | number;
-    available?: boolean;
-    weight?: number;
-    options?: unknown[];
-};
+/** Raw product type from third-party inventory API (generated from TypeSpec) */
+type RawProduct = components["schemas"]["Product"];
+type RawVariantOption = components["schemas"]["VariantOption"];
 
 function isRawProduct(item: unknown): item is RawProduct {
     if (typeof item !== "object" || item === null) {
@@ -23,8 +18,8 @@ function isRawProduct(item: unknown): item is RawProduct {
     );
 }
 
-function isRawOption(item: unknown): item is Record<string, unknown> {
-    return typeof item === "object" && item !== null;
+function isRawOption(item: unknown): item is RawVariantOption {
+    return typeof item === "object" && item !== null && "quantity" in item;
 }
 
 function normalizeProduct(raw: RawProduct) {
@@ -49,7 +44,7 @@ function normalizeProduct(raw: RawProduct) {
     };
 }
 
-function normalizeOption(raw: Record<string, unknown>): VariantOption {
+function normalizeOption(raw: RawVariantOption): VariantOption {
     const attributes: Record<string, (string | number)[]> = {};
 
     for (const [key, value] of Object.entries(raw)) {

@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Lager 21 API
+  title: Lager 21 Inventory API
   version: 0.0.0
 tags:
   - name: Products
@@ -54,6 +54,16 @@ components:
       properties:
         error:
           type: string
+    InventoryData:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+      description: Root inventory structure from third-party JSON.
     Product:
       type: object
       required:
@@ -73,8 +83,8 @@ components:
         brand:
           type: string
         price:
-          type: number
-          format: double
+          type: string
+          description: Price in SEK (stored as string in JSON)
         available:
           type: boolean
         weight:
@@ -84,6 +94,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VariantOption'
+      description: A product in the inventory.
     ProductListResponse:
       type: object
       required:
@@ -100,17 +111,33 @@ components:
     VariantOption:
       type: object
       required:
-        - attributes
         - quantity
       properties:
-        attributes:
-          type: object
-          additionalProperties:
-            type: array
-            items: {}
+        color:
+          anyOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Color options - can be string or string array in raw JSON
+        power:
+          type: array
+          items:
+            type: number
+            format: double
+          description: Power options in watts (for lighting products)
+        storage:
+          type: array
+          items:
+            type: string
+          description: Storage options in GB (for electronics)
         quantity:
           type: integer
           format: int32
+          description: Stock quantity for this variant
+      description: |-
+        Product variant with optional attributes.
+        Color can be a single string or array of strings.
 servers:
   - url: http://localhost:3000
     description: Development server
