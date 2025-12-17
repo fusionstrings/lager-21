@@ -43,4 +43,4 @@ next-env.d.ts
 test-results/.last-run.json
 
 # typespec output (regenerate with npm run generate-types)
-tsp-output/
+# tsp-output/
